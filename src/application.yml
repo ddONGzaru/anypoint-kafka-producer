@@ -21,7 +21,7 @@ kafka:
   auto.commit.interval.ms: 1000
   group.id: anypoint.tv.group
   topic:
-      log.collector: log.collector.test.0001
+      log.collector: log.collector.test.0002
       log.collector.thread.nums: 4
       realtime.analytics: realtime.analytics.test.0001
       realtime.analytics.thread.nums: 4
@@ -36,6 +36,9 @@ log.impression:
     campaign.genre: ImpressionLogCampaignGenre
     campaign.period: ImpressionLogCampaignPeriod
     campaign.region: ImpressionLogCampaignRegion
+
+#dataset
+dataset.dir: "2015-10-28"
 
 #logging
 logging.config: classpath:logback.xml

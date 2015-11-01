@@ -92,7 +92,7 @@ public class TestResultReporter {
 
     public static void truncateTables(DataSource dataSource) {
 
-        String sqlScriptPath = System.getProperty("user.dir") + "/src/test/resources/sql/truncate.sql";
+        String sqlScriptPath = System.getProperty("user.dir") + "/src/dataset/sql/truncate.sql";
 
         try(Connection conn = dataSource.getConnection()) {
             ScriptUtils.executeSqlScript(conn, new FileSystemResource(sqlScriptPath));

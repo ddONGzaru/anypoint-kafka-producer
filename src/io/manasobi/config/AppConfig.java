@@ -3,14 +3,9 @@ package io.manasobi.config;
 import com.zaxxer.hikari.HikariDataSource;
 import io.manasobi.utils.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.YamlPropertiesFactoryBean;
-import org.springframework.boot.autoconfigure.jdbc.DataSourceBuilder;
-import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.PropertySources;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.core.env.Environment;
 import org.springframework.core.env.MutablePropertySources;
@@ -21,7 +16,6 @@ import org.springframework.core.io.Resource;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import javax.sql.DataSource;
-import java.util.Iterator;
 import java.util.Properties;
 
 /**
@@ -45,6 +39,7 @@ public class AppConfig {
         dataSource.setJdbcUrl(props.getProperty("datasource.jdbc-url"));
         dataSource.setUsername(props.getProperty("datasource.username"));
         dataSource.setPassword(props.getProperty("datasource.password"));
+
         return dataSource;
     }
 
@@ -93,4 +88,5 @@ public class AppConfig {
 
         return configurer;
     }
+
 }

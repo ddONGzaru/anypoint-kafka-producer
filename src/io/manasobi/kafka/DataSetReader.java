@@ -1,8 +1,9 @@
-package io.manasobi.io;
+package io.manasobi.kafka;
 
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.io.ByteBufferInput;
 import com.esotericsoftware.kryo.io.KryoObjectInput;
+import io.manasobi.utils.FileUtils;
 import lombok.extern.slf4j.Slf4j;
 import tv.anypoint.domain.ImpressionLog;
 
@@ -18,7 +19,14 @@ public class DataSetReader {
 
     public List<ImpressionLog> read(String datasetDir, int page, int size) {
 
-        String fileDir = System.getProperty("user.dir") + "/src/test/resources/dataset/" + datasetDir + "/";
+        String fileDir;
+        String userDir = System.getProperty("user.dir");
+
+        if (FileUtils.existsDir(userDir + "/src/dataset/")) {
+            fileDir = userDir + "/src/dataset/" + datasetDir + "/";
+        } else {
+            fileDir = userDir + "/" + datasetDir + "/";
+        }
 
         String datasetPrefix = datasetDir.replaceAll("-", "");
 

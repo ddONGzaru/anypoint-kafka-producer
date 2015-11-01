@@ -1,10 +1,8 @@
 package io.manasobi.kafka;
 
 import com.google.common.collect.Lists;
-import io.manasobi.io.CSVFileWriter;
-import io.manasobi.io.DataSetReader;
-import io.manasobi.io.DataSetWriter;
 import io.manasobi.utils.DateUtils;
+import javafx.scene.control.TextArea;
 import kafka.javaapi.producer.Producer;
 import kafka.producer.KeyedMessage;
 import lombok.extern.slf4j.Slf4j;
@@ -13,6 +11,7 @@ import tv.anypoint.domain.ImpressionLog;
 
 import java.io.ByteArrayOutputStream;
 import java.io.ObjectOutputStream;
+import java.io.PrintStream;
 import java.text.MessageFormat;
 import java.util.Date;
 import java.util.List;
@@ -39,9 +38,16 @@ public class KafkaMessageWorker implements Runnable {
 
     private boolean enableDataSetWriteJob = false;
 
-    private String datasetDir = "2015-10-27";
+    private String datasetDir = "2015-10-28";
 
-    KafkaMessageWorker(String topic, JdbcTemplate jdbcTemplate, int page, int size, boolean decreaseIndex) {
+    private KafkaMessageProducer.Console console = new KafkaMessageProducer.Console();
+
+    private TextArea textArea;
+
+    PrintStream ps;
+
+    KafkaMessageWorker(String topic, JdbcTemplate jdbcTemplate, int page, int size,
+           boolean decreaseIndex, String datasetDir, TextArea textArea) {
 
         this.topic = topic;
         this.jdbcTemplate = jdbcTemplate;
@@ -49,77 +55,45 @@ public class KafkaMessageWorker implements Runnable {
         this.page = (decreaseIndex) ? --page * size : page * size;
         this.size = size;
 
+        //this.datasetDir = datasetDir;
+        this.textArea = textArea;
+
         producer = ProducerFactory.getInstance();
+
+        console.setTextArea(textArea);
+
     }
-
-    /*private Producer<String, byte[]> buildProducer() {
-
-        Properties props = new Properties();
-
-        props.put("metadata.broker.list", "localhost:9092,localhost:9093");
-        //props.put("metadata.broker.list", "175.119.226.171:9092,175.119.226.171:9093,175.119.226.171:9094");
-        props.put("partitioner.class", RoundRobinPartitioner.class.getName());
-        props.put("compression.codec", "2");
-        props.put("key.serializer.class", "kafka.serializer.StringEncoder");
-
-        ProducerConfig producerConfig = new ProducerConfig(props);
-
-        return new Producer<>(producerConfig);
-    }*/
 
     @Override
     public void run() {
 
         List<ImpressionLog> messageList = Lists.newArrayList();
 
-        if (enableDataSetWriteJob) {
+        DataSetReader reader = new DataSetReader();
 
-            String sql =
-                    MessageFormat.format("SELECT * FROM ImpressionLog ORDER BY impressionTime DESC LIMIT {0}, {1}", String.valueOf(page), String.valueOf(size));
+        messageList = reader.read(datasetDir, page, size);
 
-            List resultMapList = jdbcTemplate.queryForList(sql);
-
-            for (Object obj : resultMapList) {
-
-                Map resultMap = (Map) obj;
-
-                messageList.add(convertMapToMessage(resultMap));
-            }
-
-            String fileName = DateUtils.getCurrentDateAsString("yyyyMMdd") + "_impression-log_offset_" +
-                    String.format("%06d", this.page) + "_size_" + this.size + ".jdo";
-
-            DataSetWriter writer = new DataSetWriter();
-
-            writer.write(messageList, fileName);
-
-        } else {
-
-            DataSetReader reader = new DataSetReader();
-
-            messageList = reader.read(datasetDir, page, size);
-        }
 
         for (ImpressionLog message : messageList) {
 
             producer.send(new KeyedMessage<String, byte[]>(topic, generateKey(), toByteArray(message)));
         }
 
-        log.debug("Dataset 레코드 총계: {}", messageList.size());
+        String now = DateUtils.getCurrentTimestampAsString();
+        String logTimestamp = MessageFormat.format("[{0}] ", now);
 
+        PrintStream ps = new PrintStream(console, true);
 
-        if (enableCSVFileWriteJob) {
+        System.setOut(ps);
+        System.setErr(ps);
 
-            CSVFileWriter writer = new CSVFileWriter();
+        console.write(logTimestamp + "Dataset 레코드 총계: " + messageList.size());
+        log.info(logTimestamp + "Dataset 레코드 총계: " + messageList.size());
 
-            String fileName = "impression-log_page_" + String.format("%05d", this.page) +
-                    "_size_" + this.size + "_" + DateUtils.getCurrentDateTime("yyyy-MM-dd_HH:mm:ss.SSS") + ".csv";
-
-            writer.write(fileName, messageList);
-
-        }
+        ps.close();
 
         producer.close();
+
     }
 
     private ImpressionLog convertMapToMessage(Map resultMap) {
