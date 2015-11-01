@@ -1,5 +1,7 @@
 package io.manasobi;
 
+import io.manasobi.kafka.ProducerFactory;
+import io.manasobi.utils.FileUtils;
 import javafx.application.Application;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
@@ -12,7 +14,16 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
+import kafka.javaapi.producer.Producer;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.context.config.ConfigFileApplicationListener;
+import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.jdbc.core.JdbcTemplate;
 
+import java.sql.SQLException;
+
+@SpringBootApplication
 public class AppRunner extends Application {
 
     @Override
@@ -83,34 +94,46 @@ public class AppRunner extends Application {
 
     public static void main(String[] args) {
 
-        /*SpringApplication app = new SpringApplication(AppRunner.class);
+        SpringApplication app = new SpringApplication(AppRunner.class);
 
         app.addListeners(getConfigFileApplicationListener(args));
-        app.run(args);*/
+
+        ConfigurableApplicationContext context = app.run(args);
+
+        Producer producer = ProducerFactory.getInstance();
+
+        JdbcTemplate jdbcTemplate = (JdbcTemplate) context.getBean("jdbcTemplate");
+
+        try {
+            System.out.println(jdbcTemplate.getDataSource().getConnection().getSchema());
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
 
         launch(args);
 
 
     }
 
-    /*private static ConfigFileApplicationListener getConfigFileApplicationListener(String[] args) {
+    private static ConfigFileApplicationListener getConfigFileApplicationListener(String[] args) {
 
         String configFilePath;
 
         String userDir = System.getProperty("user.dir");
 
-        String configFile = userDir + "/build/classes/main/application.yml";
+        String configFile = "/build/classes/application.yml";
 
-        *//*if (FileUtils.existsFile(userDir + configFile)) {
+        if (FileUtils.existsFile(userDir + configFile)) {
             configFilePath = userDir + configFile;
         } else {
-            configFilePath = userDir + "/application.yml";
-        }*//*
+            configFilePath = userDir + "/anypoint-kafka-producer.conf";
+        }
 
         ConfigFileApplicationListener listener = new ConfigFileApplicationListener();
 
-        //listener.setSearchLocations(configFilePath);
+        listener.setSearchLocations(configFilePath);
 
         return listener;
-    }*/
+    }
 }

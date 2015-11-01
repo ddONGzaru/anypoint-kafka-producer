@@ -7,7 +7,18 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" name="org.springframework:spring-jdbc:4.1.7.RELEASE" level="project" />
-    <orderEntry type="library" name="org.springframework:spring-context:4.1.7.RELEASE" level="project" />
+    <orderEntry type="library" name="org.springframework.boot:spring-boot-starter:1.2.7.RELEASE" level="project" />
+    <orderEntry type="library" name="org.springframework:spring-jdbc:4.1.8.RELEASE" level="project" />
+    <orderEntry type="library" name="org.mariadb.jdbc:mariadb-java-client:1.2.2" level="project" />
+    <orderEntry type="library" name="commons-io:commons-io:2.4" level="project" />
+    <orderEntry type="library" name="joda-time:joda-time:2.3" level="project" />
+    <orderEntry type="library" name="com.esotericsoftware:kryo:3.0.0" level="project" />
+    <orderEntry type="library" name="org.apache.kafka:kafka_2.10:0.8.2.1" level="project" />
+    <orderEntry type="library" name="org.apache.kafka:kafka-clients:0.8.2.1" level="project" />
+    <orderEntry type="library" name="org.hibernate.javax.persistence:hibernate-jpa-2.1-api:1.0.0.Final" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="org.projectlombok:lombok:1.12.6" level="project" />
+    <orderEntry type="library" name="com.google.guava:guava:17.0" level="project" />
+    <orderEntry type="library" name="HikariCP-2.3.1" level="project" />
+    <orderEntry type="library" name="org.javassist:javassist:3.19.0-GA" level="project" />
   </component>
 </module>
